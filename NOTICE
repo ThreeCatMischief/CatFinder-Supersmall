@@ -1,0 +1,7 @@
+Third-party code and dependencies
+
+Firmware: Arduino-ESP32 core (LGPL-2.1), esp32-camera driver (Apache-2.0),
+ESP-IDF (Apache-2.0), built with the pioarduino PlatformIO platform (Apache-2.0).
+
+Android app: AndroidX and Jetpack Compose (Apache-2.0), Kotlin standard library and
+kotlinx.coroutines (Apache-2.0).
