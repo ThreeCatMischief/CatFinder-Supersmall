@@ -1,7 +1,7 @@
 # CatFinder Supersmall
 
 A tiny FPV tank to check on your cats while you are at work. Drive it through your home from
-your phone and see what they are up to. Usually sleeping.
+your phone and see what they are up to.
 
 <p align="center"><img src="docs/img/how-it-works.svg" alt="Your phone sends steering commands over your home WiFi to CatFinder, CatFinder sends live video back" width="820"></p>
 
@@ -30,8 +30,7 @@ few clicks, and set up WiFi from your phone.
 | 🔌 | ESP32-CAM-MB adapter | The small USB board the ESP32-CAM plugs into. Often sold together with it. Only needed to install the software. |
 | ⚙️ | 2 × SG90 servo without potentiometer | They drive the treads. See [step 2](#step-2-prepare-the-servos). |
 | 🛞 | 2 × 608 bearing | Standard skateboard bearing. |
-| 🔋 | 5 V power source | Must deliver at least 1.5 A. Weak supplies make the board restart. |
-| 🧵 | A few wires | To connect the servos and the power source. A soldering iron makes this easier. |
+| 🔋 | 5 V power source | Must deliver at least 1.5 A. |
 
 Also: a computer with the Chrome or Edge browser (once, for the software) and a USB **data**
 cable. Some cables only charge; those do not work.
