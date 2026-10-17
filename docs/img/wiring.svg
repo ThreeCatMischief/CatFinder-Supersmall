@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" width="900" height="520" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="900" height="520" rx="24" fill="#FFF6EC"/>
+
+  <!-- ESP32-CAM -->
+  <rect x="80" y="100" width="210" height="310" rx="10" fill="#1F2A44"/>
+  <rect x="110" y="130" width="90" height="90" rx="6" fill="#0E1424"/>
+  <circle cx="155" cy="175" r="30" fill="#2B3A5C"/><circle cx="155" cy="175" r="17" fill="#0B0F1A"/><circle cx="162" cy="168" r="5" fill="#5B7BE0"/>
+  <text x="140" y="392" text-anchor="middle" font-size="16" font-weight="700" fill="#FFFFFF">ESP32-CAM</text>
+  <text x="185" y="76" text-anchor="middle" font-size="14" fill="#7A6F66">Pin names are printed on the back of the board.</text>
+  <text x="185" y="94" text-anchor="middle" font-size="14" fill="#7A6F66">Use the pin row that starts with 5V.</text>
+
+  <!-- header pins: 5V GND IO12 IO13 IO15 IO14 IO2 IO4 -->
+  <g font-size="14" font-weight="600" text-anchor="end">
+    <circle cx="276" cy="140" r="7" fill="#E53935"/><text x="262" y="145" fill="#FFFFFF">5V</text>
+    <circle cx="276" cy="174" r="7" fill="#111111" stroke="#FFFFFF" stroke-width="1.5"/><text x="262" y="179" fill="#FFFFFF">GND</text>
+    <circle cx="276" cy="208" r="6" fill="#59627A"/><text x="262" y="213" fill="#8A93AA">IO12</text>
+    <circle cx="276" cy="242" r="7" fill="#FF9800"/><text x="262" y="247" fill="#FFFFFF">IO13</text>
+    <circle cx="276" cy="276" r="6" fill="#59627A"/><text x="262" y="281" fill="#8A93AA">IO15</text>
+    <circle cx="276" cy="310" r="6" fill="#59627A"/><text x="262" y="315" fill="#8A93AA">IO14</text>
+    <circle cx="276" cy="344" r="7" fill="#FF9800"/><text x="262" y="349" fill="#FFFFFF">IO2</text>
+    <circle cx="276" cy="378" r="6" fill="#59627A"/><text x="262" y="383" fill="#8A93AA">IO4</text>
+  </g>
+
+  <!-- wires; a light halo marks where wires cross without connecting -->
+  <g fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 5V rail -->
+    <path d="M283,140 L540,140 M540,85 L540,370 M540,85 L640,85 M540,240 L640,240 M540,370 L640,370" stroke="#E53935"/>
+    <!-- GND rail -->
+    <path d="M283,174 L560,174" stroke="#FFF6EC" stroke-width="11"/>
+    <path d="M283,174 L560,174 M560,105 L560,355 M560,105 L640,105 M560,225 L640,225 M560,355 L640,355" stroke="#5A3A22"/>
+    <path d="M560,240 L640,240" stroke="#FFF6EC" stroke-width="11"/>
+    <path d="M560,240 L640,240" stroke="#E53935"/>
+    <path d="M560,370 L640,370" stroke="#FFF6EC" stroke-width="11"/>
+    <path d="M560,370 L640,370" stroke="#E53935"/>
+    <!-- signals -->
+    <path d="M640,255 L330,255 L330,242 L283,242" stroke="#FFF6EC" stroke-width="11"/>
+    <path d="M640,255 L330,255 L330,242 L283,242" stroke="#FF9800"/>
+    <path d="M640,385 L330,385 L330,344 L283,344" stroke="#FFF6EC" stroke-width="11"/>
+    <path d="M640,385 L330,385 L330,344 L283,344" stroke="#FF9800"/>
+  </g>
+  <g fill="#2B2622">
+    <circle cx="540" cy="140" r="7" fill="#E53935"/><circle cx="560" cy="174" r="7" fill="#5A3A22"/>
+    <circle cx="540" cy="240" r="7" fill="#E53935"/><circle cx="540" cy="370" r="7" fill="#E53935"/>
+    <circle cx="560" cy="225" r="7" fill="#5A3A22"/><circle cx="560" cy="355" r="7" fill="#5A3A22"/>
+  </g>
+
+  <!-- power source -->
+  <rect x="640" y="60" width="200" height="70" rx="12" fill="#2B2622"/>
+  <text x="740" y="92" text-anchor="middle" font-size="16" font-weight="700" fill="#FFFFFF">5 V power</text>
+  <text x="740" y="113" text-anchor="middle" font-size="13" fill="#C9BEB4">battery with 5 V output</text>
+  <text x="652" y="80" font-size="15" font-weight="700" fill="#E53935">+</text>
+  <text x="652" y="111" font-size="17" font-weight="700" fill="#C9BEB4">−</text>
+
+  <!-- servos -->
+  <g>
+    <rect x="640" y="200" width="200" height="80" rx="10" fill="#2E5BD8"/>
+    <circle cx="800" cy="240" r="18" fill="#1C3A99"/><circle cx="800" cy="240" r="6" fill="#FFFFFF"/>
+    <text x="700" y="237" text-anchor="middle" font-size="16" font-weight="700" fill="#FFFFFF">Left servo</text>
+    <text x="700" y="258" text-anchor="middle" font-size="13" fill="#D5DEFA">SG90</text>
+  </g>
+  <g>
+    <rect x="640" y="330" width="200" height="80" rx="10" fill="#2E5BD8"/>
+    <circle cx="800" cy="370" r="18" fill="#1C3A99"/><circle cx="800" cy="370" r="6" fill="#FFFFFF"/>
+    <text x="700" y="367" text-anchor="middle" font-size="16" font-weight="700" fill="#FFFFFF">Right servo</text>
+    <text x="700" y="388" text-anchor="middle" font-size="13" fill="#D5DEFA">SG90</text>
+  </g>
+
+  <!-- legend -->
+  <g font-size="15" fill="#2B2622">
+    <rect x="80" y="452" width="26" height="8" rx="4" fill="#E53935"/><text x="114" y="461">red: power (5V)</text>
+    <rect x="290" y="452" width="26" height="8" rx="4" fill="#5A3A22"/><text x="324" y="461">brown or black: ground (GND)</text>
+    <rect x="580" y="452" width="26" height="8" rx="4" fill="#FF9800"/><text x="614" y="461">orange: signal</text>
+  </g>
+  <text x="80" y="492" font-size="14" fill="#7A6F66">Dots are joints: the wires there are connected. Where wires cross without a dot, they are not.</text>
+</svg>

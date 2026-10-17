@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 470" width="900" height="470" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#C9BEB4"/></marker>
+    <g id="lock"><rect x="-6" y="-3" width="12" height="9" rx="2" fill="#7A6F66"/><path d="M-3.5,-3 V-6 a3.5,3.5 0 0 1 7,0 V-3" fill="none" stroke="#7A6F66" stroke-width="2"/></g>
+    <g id="bars"><rect x="0" y="6" width="3" height="4" fill="#2B2622"/><rect x="5" y="3" width="3" height="7" fill="#2B2622"/><rect x="10" y="0" width="3" height="10" fill="#2B2622"/></g>
+  </defs>
+  <rect width="900" height="470" rx="24" fill="#FFF6EC"/>
+
+  <!-- phone 1: WiFi settings -->
+  <g transform="translate(60,30)">
+    <rect width="200" height="360" rx="28" fill="#2B2622"/>
+    <rect x="10" y="12" width="180" height="336" rx="20" fill="#FFFFFF"/>
+    <text x="26" y="56" font-size="20" font-weight="700" fill="#2B2622">Wi-Fi</text>
+    <rect x="18" y="74" width="164" height="44" rx="10" fill="#FDE3D2" stroke="#F26B1D" stroke-width="2"/>
+    <text x="30" y="101" font-size="14" font-weight="700" fill="#2B2622">CatFinder-A1B2</text>
+    <use href="#bars" x="160" y="91"/>
+    <text x="30" y="148" font-size="14" fill="#2B2622">Home WiFi</text>
+    <use href="#lock" x="150" y="143"/><use href="#bars" x="160" y="136"/>
+    <line x1="26" y1="164" x2="174" y2="164" stroke="#EDE7E1"/>
+    <text x="30" y="190" font-size="14" fill="#2B2622">Neighbours</text>
+    <use href="#lock" x="150" y="185"/><use href="#bars" x="160" y="178"/>
+  </g>
+  <text x="160" y="420" text-anchor="middle" font-size="16" font-weight="700" fill="#2B2622">1. Join CatFinder-XXXX</text>
+  <text x="160" y="442" text-anchor="middle" font-size="14" fill="#7A6F66">no password</text>
+
+  <path d="M282,210 L338,210" stroke="#C9BEB4" stroke-width="4" marker-end="url(#a)"/>
+
+  <!-- phone 2: setup page -->
+  <g transform="translate(350,30)">
+    <rect width="200" height="360" rx="28" fill="#2B2622"/>
+    <rect x="10" y="12" width="180" height="336" rx="20" fill="#FFFFFF"/>
+    <text x="24" y="52" font-size="14" font-weight="700" fill="#2B2622">Connect CatFinder</text>
+    <text x="24" y="70" font-size="14" font-weight="700" fill="#2B2622">to your WiFi</text>
+    <rect x="18" y="86" width="164" height="38" rx="8" fill="#FDE3D2" stroke="#F26B1D" stroke-width="2"/>
+    <text x="30" y="110" font-size="13" font-weight="700" fill="#2B2622">Home WiFi</text>
+    <use href="#lock" x="150" y="106"/><use href="#bars" x="160" y="99"/>
+    <rect x="18" y="130" width="164" height="34" rx="8" fill="#F7F3EF"/>
+    <text x="30" y="152" font-size="13" fill="#2B2622">Neighbours</text>
+    <text x="24" y="192" font-size="12" fill="#7A6F66">Password</text>
+    <rect x="18" y="198" width="164" height="34" rx="8" fill="#FFFFFF" stroke="#C9BEB4"/>
+    <text x="30" y="220" font-size="14" fill="#2B2622">••••••••</text>
+    <rect x="18" y="246" width="164" height="38" rx="10" fill="#F26B1D"/>
+    <text x="100" y="270" text-anchor="middle" font-size="15" font-weight="700" fill="#FFFFFF">Connect</text>
+  </g>
+  <text x="450" y="420" text-anchor="middle" font-size="16" font-weight="700" fill="#2B2622">2. Pick your WiFi, enter its password</text>
+  <text x="450" y="442" text-anchor="middle" font-size="14" fill="#7A6F66">the page opens by itself, or go to 192.168.4.1</text>
+
+  <path d="M572,210 L628,210" stroke="#C9BEB4" stroke-width="4" marker-end="url(#a)"/>
+
+  <!-- phone 3: done -->
+  <g transform="translate(640,30)">
+    <rect width="200" height="360" rx="28" fill="#2B2622"/>
+    <rect x="10" y="12" width="180" height="336" rx="20" fill="#FFFFFF"/>
+    <circle cx="100" cy="130" r="38" fill="#2EA44F"/>
+    <path d="M82,131 L95,144 L120,116" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="100" y="200" text-anchor="middle" font-size="16" font-weight="700" fill="#2B2622">Saved</text>
+    <text x="100" y="224" text-anchor="middle" font-size="12" fill="#7A6F66">CatFinder restarts</text>
+    <text x="100" y="241" text-anchor="middle" font-size="12" fill="#7A6F66">and joins Home WiFi.</text>
+  </g>
+  <text x="740" y="420" text-anchor="middle" font-size="16" font-weight="700" fill="#2B2622">3. Back to your home WiFi</text>
+  <text x="740" y="442" text-anchor="middle" font-size="14" fill="#7A6F66">done, time to drive</text>
+</svg>

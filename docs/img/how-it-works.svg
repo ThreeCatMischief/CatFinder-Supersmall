@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 75 900 245" width="900" height="245" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="ao" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#F26B1D"/></marker>
+    <marker id="ab" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2E5BD8"/></marker>
+  </defs>
+  <rect y="75" width="900" height="245" rx="24" fill="#FFF6EC"/>
+
+  <!-- phone, landscape, showing the video -->
+  <g transform="translate(40,105)">
+    <rect width="240" height="130" rx="18" fill="#2B2622"/>
+    <rect x="12" y="10" width="216" height="110" rx="8" fill="#E9D3B8"/>
+    <rect x="12" y="72" width="216" height="48" fill="#C79A6B"/>
+    <rect x="120" y="38" width="96" height="42" rx="10" fill="#B88B8B"/>
+    <!-- cat on the sofa -->
+    <ellipse cx="170" cy="36" rx="24" ry="13" fill="#2B2622"/>
+    <circle cx="193" cy="27" r="10" fill="#2B2622"/>
+    <path d="M186,21 L189,10 L195,19 Z M195,19 L201,10 L202,22 Z" fill="#2B2622"/>
+    <path d="M147,38 Q132,30 140,18" stroke="#2B2622" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- joystick overlay -->
+    <circle cx="52" cy="82" r="26" fill="#FFFFFF" fill-opacity="0.55" stroke="#FFFFFF"/>
+    <circle cx="58" cy="74" r="11" fill="#F26B1D"/>
+  </g>
+  <text x="160" y="270" text-anchor="middle" font-size="19" font-weight="700" fill="#2B2622">Your phone</text>
+  <text x="160" y="294" text-anchor="middle" font-size="15" fill="#7A6F66">Android app or any web browser</text>
+
+  <!-- router -->
+  <g transform="translate(390,140)">
+    <path d="M30,38 L22,0 M90,38 L98,0" stroke="#2B2622" stroke-width="5" stroke-linecap="round"/>
+    <rect x="0" y="36" width="120" height="44" rx="10" fill="#2B2622"/>
+    <circle cx="22" cy="58" r="4" fill="#2EA44F"/><circle cx="38" cy="58" r="4" fill="#2EA44F"/><circle cx="54" cy="58" r="4" fill="#2EA44F"/>
+    <path d="M38,-14 Q60,-34 82,-14 M46,-4 Q60,-18 74,-4" stroke="#7A6F66" stroke-width="4" fill="none" stroke-linecap="round"/>
+  </g>
+  <text x="450" y="270" text-anchor="middle" font-size="19" font-weight="700" fill="#2B2622">Your home WiFi</text>
+  <text x="450" y="294" text-anchor="middle" font-size="15" fill="#7A6F66">no cloud, no account</text>
+
+  <!-- tank, side view -->
+  <g transform="translate(640,120)">
+    <rect x="155" y="0" width="34" height="26" rx="5" fill="#2B2622"/>
+    <circle cx="180" cy="13" r="8" fill="#5B7BE0"/><circle cx="180" cy="13" r="3" fill="#FFFFFF"/>
+    <rect x="12" y="22" width="190" height="58" rx="10" fill="#F26B1D"/>
+    <rect x="12" y="22" width="190" height="14" rx="7" fill="#C9530F"/>
+    <rect x="0" y="66" width="214" height="54" rx="27" fill="#3A3A3A"/>
+    <circle cx="27" cy="93" r="22" fill="#2E5BD8"/><circle cx="27" cy="93" r="7" fill="#1C3A99"/>
+    <circle cx="187" cy="93" r="22" fill="#2E5BD8"/><circle cx="187" cy="93" r="7" fill="#1C3A99"/>
+    <circle cx="80" cy="100" r="10" fill="#6B6B6B"/><circle cx="134" cy="100" r="10" fill="#6B6B6B"/>
+  </g>
+  <text x="747" y="270" text-anchor="middle" font-size="19" font-weight="700" fill="#2B2622">CatFinder</text>
+  <text x="747" y="294" text-anchor="middle" font-size="15" fill="#7A6F66">ESP32-CAM, 2 servos, 3D printed</text>
+
+  <!-- data flow -->
+  <path d="M292,138 L374,138" stroke="#F26B1D" stroke-width="4" marker-end="url(#ao)"/>
+  <path d="M528,138 L612,138" stroke="#F26B1D" stroke-width="4" marker-end="url(#ao)"/>
+  <text x="333" y="124" text-anchor="middle" font-size="15" font-weight="600" fill="#F26B1D">steering</text>
+  <text x="570" y="124" text-anchor="middle" font-size="15" font-weight="600" fill="#F26B1D">steering</text>
+  <path d="M612,210 L530,210" stroke="#2E5BD8" stroke-width="4" marker-end="url(#ab)"/>
+  <path d="M374,210 L294,210" stroke="#2E5BD8" stroke-width="4" marker-end="url(#ab)"/>
+  <text x="333" y="236" text-anchor="middle" font-size="15" font-weight="600" fill="#2E5BD8">live video</text>
+  <text x="570" y="236" text-anchor="middle" font-size="15" font-weight="600" fill="#2E5BD8">live video</text>
+</svg>

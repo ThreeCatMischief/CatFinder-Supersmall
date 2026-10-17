@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 360" width="900" height="360" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2B2622"/></marker>
+    <g id="ts">
+      <circle cx="0" cy="0" r="4" fill="#2B2622"/><circle cx="12" cy="0" r="4" fill="#2B2622"/><circle cx="24" cy="0" r="4" fill="#2B2622"/>
+      <circle cx="0" cy="12" r="4" fill="#C9BEB4"/><circle cx="12" cy="12" r="4" fill="#2B2622"/><circle cx="24" cy="12" r="4" fill="#C9BEB4"/>
+      <circle cx="0" cy="24" r="4" fill="#C9BEB4"/><circle cx="12" cy="24" r="4" fill="#2B2622"/><circle cx="24" cy="24" r="4" fill="#C9BEB4"/>
+    </g>
+  </defs>
+  <rect width="900" height="360" rx="24" fill="#FFF6EC"/>
+
+  <!-- at work -->
+  <text x="100" y="44" text-anchor="middle" font-size="15" font-weight="700" fill="#7A6F66">AT WORK</text>
+  <g transform="translate(50,90)">
+    <rect width="100" height="180" rx="16" fill="#2B2622"/>
+    <rect x="7" y="10" width="86" height="160" rx="10" fill="#FFFFFF"/>
+    <use href="#ts" x="38" y="40"/>
+    <rect x="18" y="104" width="64" height="26" rx="13" fill="#2EA44F"/>
+    <text x="50" y="122" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">ON</text>
+  </g>
+  <text x="100" y="305" text-anchor="middle" font-size="15" font-weight="700" fill="#2B2622">Your phone</text>
+  <text x="100" y="325" text-anchor="middle" font-size="13" fill="#7A6F66">Tailscale on</text>
+
+  <!-- internet -->
+  <g transform="translate(205,130)">
+    <path d="M30,80 a32,32 0 0 1 4,-63 a40,40 0 0 1 72,-6 a30,30 0 0 1 38,30 a24,24 0 0 1 -6,39 z" fill="#FFFFFF" stroke="#C9BEB4" stroke-width="3"/>
+    <text x="80" y="58" text-anchor="middle" font-size="14" font-weight="700" fill="#2B2622">Internet</text>
+  </g>
+  <text x="285" y="245" text-anchor="middle" font-size="13" fill="#7A6F66">private, encrypted</text>
+  <path d="M158,180 L208,180" stroke="#2B2622" stroke-width="3" marker-end="url(#a)"/>
+  <path d="M355,180 L398,180" stroke="#2B2622" stroke-width="3" marker-end="url(#a)"/>
+
+  <!-- at home -->
+  <rect x="405" y="62" width="465" height="272" rx="18" fill="none" stroke="#C9BEB4" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="637" y="44" text-anchor="middle" font-size="15" font-weight="700" fill="#7A6F66">AT HOME</text>
+
+  <!-- helper device: old phone on its charger -->
+  <g transform="translate(430,100)">
+    <rect width="76" height="136" rx="12" fill="#2B2622"/>
+    <rect x="6" y="9" width="64" height="118" rx="7" fill="#FFFFFF"/>
+    <use href="#ts" x="26" y="38"/>
+    <path d="M38,136 L38,160 Q38,170 50,170 L70,170" fill="none" stroke="#2B2622" stroke-width="4"/>
+    <rect x="68" y="162" width="20" height="16" rx="3" fill="#7A6F66"/>
+  </g>
+  <text x="470" y="300" text-anchor="middle" font-size="15" font-weight="700" fill="#2B2622">Helper</text>
+  <text x="470" y="320" text-anchor="middle" font-size="12" fill="#7A6F66">always on, Tailscale</text>
+
+  <!-- router -->
+  <g transform="translate(560,150)">
+    <path d="M24,30 L18,0 M72,30 L78,0" stroke="#2B2622" stroke-width="4" stroke-linecap="round"/>
+    <rect x="0" y="28" width="96" height="36" rx="8" fill="#2B2622"/>
+    <circle cx="18" cy="46" r="3.5" fill="#2EA44F"/><circle cx="32" cy="46" r="3.5" fill="#2EA44F"/><circle cx="46" cy="46" r="3.5" fill="#2EA44F"/>
+  </g>
+  <text x="608" y="300" text-anchor="middle" font-size="15" font-weight="700" fill="#2B2622">Home WiFi</text>
+
+  <!-- tank -->
+  <g transform="translate(700,150) scale(0.68)">
+    <rect x="155" y="0" width="34" height="26" rx="5" fill="#2B2622"/>
+    <circle cx="180" cy="13" r="8" fill="#5B7BE0"/><circle cx="180" cy="13" r="3" fill="#FFFFFF"/>
+    <rect x="12" y="22" width="190" height="58" rx="10" fill="#F26B1D"/>
+    <rect x="12" y="22" width="190" height="14" rx="7" fill="#C9530F"/>
+    <rect x="0" y="66" width="214" height="54" rx="27" fill="#3A3A3A"/>
+    <circle cx="27" cy="93" r="22" fill="#2E5BD8"/><circle cx="27" cy="93" r="7" fill="#1C3A99"/>
+    <circle cx="187" cy="93" r="22" fill="#2E5BD8"/><circle cx="187" cy="93" r="7" fill="#1C3A99"/>
+    <circle cx="80" cy="100" r="10" fill="#6B6B6B"/><circle cx="134" cy="100" r="10" fill="#6B6B6B"/>
+  </g>
+  <text x="773" y="300" text-anchor="middle" font-size="15" font-weight="700" fill="#2B2622">CatFinder</text>
+  <text x="773" y="320" text-anchor="middle" font-size="12" fill="#7A6F66">no Tailscale needed</text>
+
+  <path d="M514,190 L552,190" stroke="#2B2622" stroke-width="3" marker-end="url(#a)"/>
+  <path d="M662,190 L694,190" stroke="#2B2622" stroke-width="3" marker-end="url(#a)"/>
+</svg>
