@@ -2,13 +2,14 @@ package com.catfinder.app.data
 
 import org.json.JSONObject
 
-/** The editable fields of /drive_cfg, as strings keyed by their POST names. */
+/** The fields of /drive_cfg, as strings keyed by their POST names. */
 object DriveConfigForm {
     val FLAGS = listOf(
-        "swap" to "Swap sides (servo B is left)",
-        "inv_a" to "Invert servo A",
-        "inv_b" to "Invert servo B",
+        "swap" to "Swap left and right",
+        "inv_a" to "Reverse servo A",
+        "inv_b" to "Reverse servo B",
     )
+    // Set on the robot's web page; read here for the drive-straight calculation.
     val NUMBERS = listOf(
         "stop_a" to "Stop A (µs)",
         "stop_b" to "Stop B (µs)",

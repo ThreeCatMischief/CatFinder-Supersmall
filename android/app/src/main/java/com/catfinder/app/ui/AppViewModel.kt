@@ -18,7 +18,9 @@ import com.catfinder.app.data.MjpegReader
 import com.catfinder.app.data.OfflineException
 import com.catfinder.app.data.Settings
 import com.catfinder.app.data.VideoGovernor
+import com.catfinder.app.drive.HoldDetector
 import com.catfinder.app.drive.Mixer
+import com.catfinder.app.drive.StraightCal
 import com.catfinder.app.drive.Wheels
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -49,6 +51,32 @@ data class LinkState(val ok: Boolean? = null, val rttMs: Long? = null, val error
 
 /** lagMs: capture on the ESP to arrival here; null while unknown (no clock sync, old firmware). */
 data class VideoState(val frame: ImageBitmap? = null, val fps: Float = 0f, val error: String? = null, val lagMs: Long? = null)
+
+enum class CalPhase {
+    /** Waiting for a steady forward or reverse command. */
+    DRIVE,
+    /** The same command is being held; progress counts up. */
+    HOLD,
+    SAVING,
+    /** Saved; waits for the stick to be released before the next hold. */
+    SAVED,
+    /** Saving failed; waits for the stick to be released. */
+    FAILED,
+}
+
+/**
+ * Drive-straight calibration on the drive screen. [point] indexes StraightCal.POINTS
+ * (the speed being driven), [done] the points saved since the mode was started.
+ */
+data class StraightCalState(
+    val active: Boolean = false,
+    val phase: CalPhase = CalPhase.DRIVE,
+    val point: Int? = null,
+    val progress: Float = 0f,
+    val done: Set<Int> = emptySet(),
+    val savedValue: Int? = null,
+    val error: String? = null,
+)
 
 /** Exception class and message, for the diagnostic log. */
 private fun Throwable.describe(): String {
@@ -90,17 +118,17 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     private val sentAt = object : LinkedHashMap<Long, Long>() {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Long, Long>?) = size > 2_000
     }
-    val diagLog = DiagLog.tail
     private var tankLeft = 0f
     private var tankRight = 0f
+    private val _straightCal = MutableStateFlow(StraightCalState())
+    val straightCal: StateFlow<StraightCalState> = _straightCal.asStateFlow()
+    private var calJob: Job? = null
 
     // Settings screen
     private val _driveCfg = MutableStateFlow<Map<String, String>?>(null)
     val driveCfg: StateFlow<Map<String, String>?> = _driveCfg.asStateFlow()
     private val _status = MutableStateFlow<JSONObject?>(null)
     val status: StateFlow<JSONObject?> = _status.asStateFlow()
-    private val _log = MutableStateFlow("")
-    val log: StateFlow<String> = _log.asStateFlow()
     private val _message = MutableStateFlow<String?>(null)
     val message: StateFlow<String?> = _message.asStateFlow()
     // Number of settings requests in flight.
@@ -135,6 +163,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun show(screen: Screen) {
+        if (screen != Screen.DRIVE) stopStraightCal()
         _screen.value = screen
         updateDriving()
     }
@@ -145,7 +174,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         val want = visible && _config.value.address.isNotBlank()
         if (visible) autoDiscover() else discoveryJob?.cancel()
         if (want && driveJobs.isEmpty()) {
-            DiagLog.line("drive screen on, address ${_config.value.address}, rate ${_config.value.sendRateHz} Hz, video ${_config.value.videoLevel}")
+            DiagLog.line("drive screen on, address ${_config.value.address}, video ${_config.value.videoLevel}")
             driveJobs = listOf(
                 viewModelScope.launch(Dispatchers.IO) { driveLoop() },
                 viewModelScope.launch(Dispatchers.IO) { streamLoop() },
@@ -188,7 +217,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     // ------------------------------------------------------------ driving
 
     fun setStick(x: Float, y: Float) {
-        target.value = Mixer.arcade(x, y, _config.value.shaping)
+        target.value = if (_straightCal.value.active) Mixer.calibration(x, y) else Mixer.arcade(x, y, _config.value.shaping)
     }
 
     fun setTank(left: Boolean, v: Float) {
@@ -226,8 +255,92 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
                     rttSample(null)
                 }
             }
-            val period = 1000L / _config.value.sendRateHz.coerceIn(1, 50)
+            val period = 1000L / AppConfig.SEND_RATE_HZ
             delay((period - (SystemClock.elapsedRealtime() - t0)).coerceAtLeast(5))
+        }
+    }
+
+    // ------------------------------------------------------------ drive straight
+
+    /**
+     * Opens the drive screen in drive-straight mode: the user drives with gentle
+     * steering until the tank runs straight and holds the stick there for StraightCal.HOLD_MS; the
+     * held command is then turned into the balance for the nearest speed point.
+     */
+    fun startStraightCal() {
+        target.value = Wheels.STOP
+        tankLeft = 0f
+        tankRight = 0f
+        _straightCal.value = StraightCalState(active = true)
+        show(Screen.DRIVE)
+        loadDriveConfig()  // the robot's current balance and span, for the first save
+        calJob?.cancel()
+        calJob = viewModelScope.launch { straightCalLoop() }
+        DiagLog.line("drive straight: start")
+    }
+
+    fun stopStraightCal() {
+        if (!_straightCal.value.active) return
+        calJob?.cancel()
+        calJob = null
+        target.value = Wheels.STOP
+        _straightCal.value = StraightCalState()
+        DiagLog.line("drive straight: stop")
+    }
+
+    private suspend fun straightCalLoop() {
+        val detector = HoldDetector()
+        while (coroutineContext.isActive) {
+            delay(100)
+            val state = _straightCal.value
+            val w = target.value
+            when (state.phase) {
+                CalPhase.SAVING -> continue
+                CalPhase.SAVED, CalPhase.FAILED -> {
+                    // The held command over-steers once the new balance is applied, so the
+                    // next hold starts only after the stick has been let go.
+                    if (w == Wheels.STOP) _straightCal.update { it.copy(phase = CalPhase.DRIVE, savedValue = null, error = null) }
+                    continue
+                }
+                else -> {}
+            }
+            // Commands that do not reach the robot do not count.
+            val progress = if (_link.value.ok == true && driveJobs.isNotEmpty()) {
+                detector.update(SystemClock.elapsedRealtime(), w)
+            } else {
+                detector.reset()
+                0f
+            }
+            val point = StraightCal.pointFor(maxOf(kotlin.math.abs(w.left), kotlin.math.abs(w.right)))
+                .takeIf { StraightCal.holdable(w) }
+            _straightCal.update {
+                it.copy(phase = if (progress > 0f) CalPhase.HOLD else CalPhase.DRIVE, point = point, progress = progress)
+            }
+            if (progress >= 1f && point != null) {
+                val (left, right) = detector.average() ?: continue
+                detector.reset()
+                saveStraight(point, left, right)
+            }
+        }
+    }
+
+    private suspend fun saveStraight(point: Int, left: Double, right: Double) {
+        _straightCal.update { it.copy(phase = CalPhase.SAVING) }
+        try {
+            val api = api()
+            val cfg = _driveCfg.value ?: DriveConfigForm.fromJson(api.driveConfig())
+            val bal = DriveConfigForm.BALANCE.map { (key, _) -> cfg[key]?.toIntOrNull() ?: 0 }
+            val span = cfg["span"]?.toIntOrNull() ?: 500
+            val value = StraightCal.balanceFor(left, right, bal, span)
+            _driveCfg.value = DriveConfigForm.fromJson(api.saveDriveConfig(mapOf("bal$point" to value.toString())))
+            DiagLog.line("drive straight: held L%.1f R%.1f, %d %% balance %d -> %d µs".format(
+                left, right, StraightCal.POINTS[point], bal[point], value))
+            _straightCal.update { it.copy(phase = CalPhase.SAVED, done = it.done + point, savedValue = value, progress = 1f) }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            DiagLog.line("drive straight: save FAIL ${e.describe()}")
+            _straightCal.update { it.copy(phase = CalPhase.FAILED, error = e.message ?: "Saving failed", progress = 0f) }
         }
     }
 
@@ -384,8 +497,6 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         if (videoChanged && driveJobs.isNotEmpty()) applyVideoLevel()
     }
 
-    fun clearDiagLog() = DiagLog.clear()
-
     /** Writes the full diagnostic log to the cache dir for sharing. */
     fun exportDiagLog(): File = DiagLog.export(File(getApplication<Application>().cacheDir, "share"))
 
@@ -431,9 +542,15 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         _driveCfg.value = DriveConfigForm.fromJson(api().driveConfig())
     }
 
-    fun saveDriveConfig(fields: Map<String, String>) = action {
-        _driveCfg.value = DriveConfigForm.fromJson(api().saveDriveConfig(fields))
-        _message.value = "Drivetrain settings stored on the robot"
+    /** One wheel setting (swap, inv_a, inv_b), stored on the robot at once. */
+    fun setDriveFlag(key: String, on: Boolean) = action {
+        _driveCfg.value = DriveConfigForm.fromJson(api().saveDriveConfig(mapOf(key to if (on) "1" else "0")))
+    }
+
+    fun resetStraight() = action {
+        val zero = DriveConfigForm.BALANCE.associate { (key, _) -> key to "0" }
+        _driveCfg.value = DriveConfigForm.fromJson(api().saveDriveConfig(zero))
+        _message.value = "Drive-straight calibration cleared"
     }
 
     fun resetDriveConfig() = action {
@@ -442,9 +559,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun refreshStatus() = action {
-        val api = api()
-        _status.value = api.status()
-        _log.value = api.log()
+        _status.value = api().status()
     }
 
     private companion object {

@@ -52,6 +52,7 @@ fun DriveScreen(vm: AppViewModel) {
     val rssi by vm.rssi.collectAsStateWithLifecycle()
     val searching by vm.searching.collectAsStateWithLifecycle()
     val videoLevel by vm.videoLevel.collectAsStateWithLifecycle()
+    val cal by vm.straightCal.collectAsStateWithLifecycle()
     val overlay = Color.Black.copy(alpha = 0.55f)
 
     Box(Modifier.fillMaxSize().background(Color.Black)) {
@@ -119,7 +120,12 @@ fun DriveScreen(vm: AppViewModel) {
             Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = Color.White)
         }
 
-        when (config.mode) {
+        if (cal.active) {
+            StraightCalOverlay(cal, onDone = vm::stopStraightCal, Modifier.align(Alignment.TopCenter).padding(top = 56.dp))
+            // Same centre as the stick below: 28 + 190 / 2 = 20 + 206 / 2.
+            HoldRing(cal, Modifier.align(Alignment.BottomStart).padding(20.dp).size(206.dp))
+        }
+        when (if (cal.active) StickMode.ARCADE else config.mode) {
             StickMode.ARCADE -> Stick(
                 Modifier.align(Alignment.BottomStart).padding(28.dp).size(190.dp),
             ) { x, y -> vm.setStick(x, y) }

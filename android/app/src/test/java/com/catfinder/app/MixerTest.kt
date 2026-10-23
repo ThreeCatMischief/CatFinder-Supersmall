@@ -43,4 +43,13 @@ class MixerTest {
     @Test fun tankIsPerWheel() = assertEquals(Wheels(100, -50), Mixer.tank(1f, -0.5f, linear))
 
     @Test fun inputBeyondRangeIsClamped() = assertEquals(Wheels(100, 100), Mixer.tank(3f, 1.5f, linear))
+
+    @Test fun calibrationThrottleIsLinearToFullSpeed() {
+        assertEquals(Wheels(50, 50), Mixer.calibration(0f, 0.525f))
+        assertEquals(Wheels(100, 100), Mixer.calibration(0f, 1f))
+    }
+
+    // Full stick sideways steers by a quarter of the range only.
+    @Test fun calibrationSteeringIsGentle() =
+        assertEquals(Wheels(75, 25), Mixer.calibration(1f, 0.525f))
 }

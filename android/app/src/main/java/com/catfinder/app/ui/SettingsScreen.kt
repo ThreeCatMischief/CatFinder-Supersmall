@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -20,7 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -43,25 +41,23 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.core.content.FileProvider
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.catfinder.app.R
 import com.catfinder.app.data.AppConfig
 import com.catfinder.app.data.DriveConfigForm
 import com.catfinder.app.data.StickMode
 import com.catfinder.app.data.VideoGovernor
+import com.catfinder.app.drive.StraightCal
 import kotlin.math.roundToInt
 
 @Composable
@@ -101,24 +97,24 @@ fun SettingsScreen(vm: AppViewModel) {
         ) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 ConnectionSection(vm)
-                JoystickSection(vm)
+                DrivingSection(vm)
             }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                DeviceSection(vm)
-                StatusSection(vm)
-                DiagnosticsSection(vm)
+                StraightSection(vm)
+                WheelsSection(vm)
+                AboutSection(vm)
             }
         }
     }
 }
 
 @Composable
-private fun Section(title: String, subtitle: String, content: @Composable ColumnScope.() -> Unit) {
+private fun Section(title: String, subtitle: String?, content: @Composable ColumnScope.() -> Unit) {
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Column {
                 Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                subtitle?.let { Hint(it) }
             }
             content()
         }
@@ -126,9 +122,13 @@ private fun Section(title: String, subtitle: String, content: @Composable Column
 }
 
 @Composable
+private fun Hint(text: String) =
+    Text(text, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+@Composable
 private fun ConnectionSection(vm: AppViewModel) {
     val config by vm.config.collectAsStateWithLifecycle()
-    Section("Connection", "How to reach the hunter.") {
+    Section("Connection", null) {
         OutlinedTextField(
             value = config.address,
             onValueChange = { vm.updateConfig(config.copy(address = it.trim())) },
@@ -142,15 +142,10 @@ private fun ConnectionSection(vm: AppViewModel) {
             Button(onClick = vm::findOnWifi) { Text("Find on my WiFi") }
             OutlinedButton(onClick = vm::testConnection) { Text("Test connection") }
         }
-        Text(
+        Hint(
             "On the same WiFi as the robot: tap Find on my WiFi, or enter the address shown in your router. " +
                 "Away from home: enter the robot's home IP address and turn Tailscale on (see the README).",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        LabeledSlider("Send rate", "${config.sendRateHz} Hz", config.sendRateHz, 5..20) {
-            vm.updateConfig(config.copy(sendRateHz = it))
-        }
         Text("Video quality")
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             val options = listOf(AppConfig.VIDEO_AUTO to "Auto") + VideoGovernor.LABELS.mapIndexed { i, l -> i to l }
@@ -162,18 +157,14 @@ private fun ConnectionSection(vm: AppViewModel) {
                 )
             }
         }
-        Text(
-            "Auto lowers resolution and frame rate when drive commands slow down, and raises them again after 8 s without delay.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        Hint("Auto lowers the picture quality when the connection gets slow, so steering stays quick.")
     }
 }
 
 @Composable
-private fun JoystickSection(vm: AppViewModel) {
+private fun DrivingSection(vm: AppViewModel) {
     val config by vm.config.collectAsStateWithLifecycle()
-    Section("Handling", "How the stick feels. Stored on this phone.") {
+    Section("Driving", "Stored on this phone.") {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(
                 selected = config.mode == StickMode.ARCADE,
@@ -183,134 +174,123 @@ private fun JoystickSection(vm: AppViewModel) {
             FilterChip(
                 selected = config.mode == StickMode.TANK,
                 onClick = { vm.updateConfig(config.copy(mode = StickMode.TANK)) },
-                label = { Text("Tank (two sticks)") },
+                label = { Text("Two sticks (tank)") },
             )
         }
-        LabeledSlider("Max speed", "${config.maxSpeed} %", config.maxSpeed, 10..100) {
-            vm.updateConfig(config.copy(maxSpeed = it))
-        }
-        LabeledSlider("Dead zone", "${config.deadZonePct} %", config.deadZonePct, 0..30) {
-            vm.updateConfig(config.copy(deadZonePct = it))
-        }
-        LabeledSlider("Expo", "${config.expoPct} %", config.expoPct, 0..100) {
-            vm.updateConfig(config.copy(expoPct = it))
+        Column {
+            Row {
+                Text("Max speed", Modifier.weight(1f))
+                Text("${config.maxSpeed} %", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Slider(
+                value = config.maxSpeed.toFloat(),
+                onValueChange = { vm.updateConfig(config.copy(maxSpeed = it.roundToInt())) },
+                valueRange = 10f..100f,
+            )
         }
     }
 }
 
 @Composable
-private fun DeviceSection(vm: AppViewModel) {
-    val loaded by vm.driveCfg.collectAsStateWithLifecycle()
-    val form = remember { mutableStateMapOf<String, String>() }
-    var confirmReset by remember { mutableStateOf(false) }
-    LaunchedEffect(loaded) {
-        form.clear()
-        loaded?.let { form.putAll(it) }
-    }
-
-    Section("Drivetrain", "Stored on the robot itself.") {
-        if (loaded == null) {
-            Text("Not loaded – the robot did not answer yet.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-        } else {
-            for ((key, label) in DriveConfigForm.FLAGS) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(label, Modifier.weight(1f))
-                    Switch(checked = form[key] == "1", onCheckedChange = { form[key] = if (it) "1" else "0" })
+private fun StraightSection(vm: AppViewModel) {
+    val cfg by vm.driveCfg.collectAsStateWithLifecycle()
+    var confirmClear by remember { mutableStateOf(false) }
+    Section("Drive straight", "No two servos are alike, so the tank may curve. Teach it to go straight.") {
+        Hint(
+            "Tap Start, then drive forward. Steer gently until CatFinder goes straight and keep the stick still " +
+                "for ${StraightCal.HOLD_MS / 1000} seconds: that is saved for the speed you are driving. " +
+                "Repeat at slow and fast speed.",
+        )
+        Button(onClick = vm::startStraightCal, enabled = cfg != null) { Text("Start") }
+        val c = cfg
+        if (c != null) {
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                DriveConfigForm.BALANCE.forEachIndexed { i, (key, _) ->
+                    val v = c[key]?.toIntOrNull() ?: 0
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            "${StraightCal.POINTS[i]} %",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(if (v == 0) "–" else if (v > 0) "L −$v" else "R −${-v}", style = MaterialTheme.typography.bodyMedium)
+                    }
                 }
             }
-            NumberGrid(DriveConfigForm.NUMBERS, form)
-            Text(
-                "Balance: µs taken off the faster wheel; > 0 slows the left wheel, < 0 the right.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            NumberGrid(DriveConfigForm.BALANCE, form, signed = true)
+            Hint("How much the left (L) or right (R) wheel is slowed at each speed, in µs.")
+        } else {
+            Hint("Connect to the robot to start.")
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = { vm.saveDriveConfig(form.toMap()) }, enabled = loaded != null) { Text("Save") }
-            OutlinedButton(onClick = vm::loadDriveConfig) { Text("Reload") }
-            TextButton(onClick = { confirmReset = true }) { Text("Reset to defaults") }
-        }
+        TextButton(onClick = { confirmClear = true }, enabled = c != null) { Text("Clear") }
     }
-
-    if (confirmReset) {
-        AlertDialog(
-            onDismissRequest = { confirmReset = false },
-            title = { Text("Forget the training?") },
-            text = { Text("Overwrites the drive settings stored on the robot with the firmware defaults, including the balance calibration.") },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirmReset = false
-                    vm.resetDriveConfig()
-                }) { Text("Reset") }
-            },
-            dismissButton = { TextButton(onClick = { confirmReset = false }) { Text("Cancel") } },
+    if (confirmClear) {
+        ConfirmDialog(
+            title = "Clear drive straight?",
+            text = "Both wheels get the same signal again at every speed.",
+            confirm = "Clear",
+            onConfirm = vm::resetStraight,
+            onDismiss = { confirmClear = false },
         )
     }
 }
 
 @Composable
-private fun NumberGrid(fields: List<Pair<String, String>>, form: MutableMap<String, String>, signed: Boolean = false) {
-    for (pair in fields.chunked(2)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            for ((key, label) in pair) {
-                OutlinedTextField(
-                    value = form[key] ?: "",
-                    onValueChange = { v ->
-                        if (v.isEmpty() || v.matches(Regex(if (signed) "-?\\d{0,5}" else "\\d{0,5}"))) form[key] = v
-                    },
-                    label = { Text(label) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f),
-                )
-            }
-            if (pair.size == 1) Spacer(Modifier.weight(1f))
-        }
-    }
-}
-
-@Composable
-private fun StatusSection(vm: AppViewModel) {
-    val status by vm.status.collectAsStateWithLifecycle()
-    val log by vm.log.collectAsStateWithLifecycle()
-    LaunchedEffect(Unit) { vm.refreshStatus() }
-
-    Section("Vital signs", "Straight from /status and /log.") {
-        OutlinedButton(onClick = vm::refreshStatus) { Text("Refresh") }
-        status?.let { s ->
-            val rows = buildList<Pair<String, String>> {
-                if (s.has("version")) add("Version" to "${s.opt("version")}")
-                if (s.has("ssid")) add("WiFi network" to "${s.opt("ssid")}")
-                for (key in s.keys()) if (key != "version" && key != "ssid") add(key to "${s.opt(key)}")
-            }
-            for ((label, value) in rows) {
-                Row {
-                    Text(label, Modifier.width(140.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(value, style = MaterialTheme.typography.bodySmall)
+private fun WheelsSection(vm: AppViewModel) {
+    val cfg by vm.driveCfg.collectAsStateWithLifecycle()
+    var confirmReset by remember { mutableStateOf(false) }
+    Section("Wheels", "Stored on the robot. Changes apply at once.") {
+        val c = cfg
+        if (c == null) {
+            Hint("Not loaded – the robot did not answer yet.")
+        } else {
+            for ((key, label) in DriveConfigForm.FLAGS) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(label, Modifier.weight(1f))
+                    Switch(checked = c[key] == "1", onCheckedChange = { vm.setDriveFlag(key, it) })
                 }
             }
         }
-        if (log.isNotEmpty()) {
-            Text("Log", style = MaterialTheme.typography.titleSmall)
-            Column(
-                Modifier.fillMaxWidth().heightIn(max = 260.dp).clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
-                    .verticalScroll(rememberScrollState()).horizontalScroll(rememberScrollState()).padding(8.dp),
-            ) {
-                Text(log, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
-            }
-        }
+        Hint("If a tread creeps while standing still, adjust its stop point on the robot's web page under Setup → Wheels.")
+        TextButton(onClick = { confirmReset = true }, enabled = c != null) { Text("Reset all wheel settings") }
+    }
+    if (confirmReset) {
+        ConfirmDialog(
+            title = "Reset wheel settings?",
+            text = "Puts all wheel settings stored on the robot back to the defaults, including drive straight.",
+            confirm = "Reset",
+            onConfirm = vm::resetDriveConfig,
+            onDismiss = { confirmReset = false },
+        )
     }
 }
 
 @Composable
-private fun DiagnosticsSection(vm: AppViewModel) {
-    val lines by vm.diagLog.collectAsStateWithLifecycle()
+private fun AboutSection(vm: AppViewModel) {
+    val status by vm.status.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    Section("Diagnostics", "Every drive request, status poll and video second, stored on this phone.") {
+    LaunchedEffect(Unit) { vm.refreshStatus() }
+
+    Section("About this robot", null) {
+        val s = status
+        if (s != null) {
+            val rows = listOfNotNull(
+                s.optString("version").takeIf { it.isNotEmpty() }?.let { "Software" to it },
+                s.optString("ssid").takeIf { it.isNotEmpty() }?.let { "WiFi network" to it },
+                s.optString("ip").takeIf { it.isNotEmpty() }?.let { "Address" to it },
+                if (s.has("rssi")) "Signal" to signal(s.optInt("rssi")) else null,
+            )
+            for ((label, value) in rows) {
+                Row {
+                    Text(label, Modifier.width(130.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(value)
+                }
+            }
+        } else {
+            Hint("The robot did not answer yet.")
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = {
+            OutlinedButton(onClick = vm::refreshStatus) { Text("Refresh") }
+            TextButton(onClick = {
                 val file = vm.exportDiagLog()
                 val uri = FileProvider.getUriForFile(context, "${context.packageName}.files", file)
                 val send = Intent(Intent.ACTION_SEND)
@@ -318,30 +298,30 @@ private fun DiagnosticsSection(vm: AppViewModel) {
                     .putExtra(Intent.EXTRA_STREAM, uri)
                     .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 context.startActivity(Intent.createChooser(send, "Share diagnostic log"))
-            }) { Text("Share log") }
-            OutlinedButton(onClick = vm::clearDiagLog) { Text("Clear") }
+            }) { Text("Share diagnostic log") }
         }
-        Column(
-            Modifier.fillMaxWidth().heightIn(max = 260.dp).clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surfaceContainerLow)
-                .verticalScroll(rememberScrollState()).horizontalScroll(rememberScrollState()).padding(8.dp),
-        ) {
-            Text(lines.takeLast(60).asReversed().joinToString("\n"), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
-        }
+        Hint("The diagnostic log helps when reporting a problem.")
     }
 }
 
+private fun signal(rssi: Int): String = when {
+    rssi >= -60 -> "good ($rssi dBm)"
+    rssi >= -72 -> "fair ($rssi dBm)"
+    else -> "weak ($rssi dBm)"
+}
+
 @Composable
-private fun LabeledSlider(label: String, value: String, current: Int, range: IntRange, onChange: (Int) -> Unit) {
-    Column {
-        Row {
-            Text(label, Modifier.weight(1f))
-            Text(value, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        Slider(
-            value = current.toFloat(),
-            onValueChange = { onChange(it.roundToInt()) },
-            valueRange = range.first.toFloat()..range.last.toFloat(),
-        )
-    }
+private fun ConfirmDialog(title: String, text: String, confirm: String, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = { Text(text) },
+        confirmButton = {
+            TextButton(onClick = {
+                onDismiss()
+                onConfirm()
+            }) { Text(confirm) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+    )
 }

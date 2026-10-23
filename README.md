@@ -135,10 +135,9 @@ the connection drops.
 
 ### Step 7: Make it drive straight
 
-No two servos are exactly alike, so the tank probably curves a little at first. Open the web
-page and fold out **Setup**.
+No two servos are exactly alike, so the tank probably curves a little at first.
 
-**Wheels**
+**Wheels** (on the web page, under **Setup → Wheels**)
 
 1. **Stop point:** press **■** for one servo. If it still creeps, change **Stop point** a few
    steps at a time until it stands still. Repeat for the other servo.
@@ -147,13 +146,22 @@ page and fold out **Setup**.
 3. **Reverse direction:** drive forward. If a tread runs backwards, tick **Reverse
    direction** for it.
 
-**Drive straight**
+**Drive straight** (in the app)
 
-Pick a speed, press **Run** and watch the tank:
+1. Open **Settings → Drive straight** and tap **Start**.
+2. Drive forward. Steering is extra gentle in this mode: steer just enough that CatFinder
+   goes straight.
+3. Keep the stick still. A ring fills up and counts down from 5. When it turns green, that
+   speed is saved and your phone vibrates.
+4. Let go of the stick, then repeat at another speed. The chips **25 % · 50 % · 75 % ·
+   100 %** show which speeds are done. Tap **Done** when you are happy.
+
+No Android phone? The web page does the same under **Setup → Drive straight**: pick a speed,
+press **Run** and adjust with **+** and **−**:
 
 <p align="center"><img src="docs/img/drive-straight.svg" alt="If the tank curves right, press plus to slow the left wheel. If it curves left, press minus to slow the right wheel" width="820"></p>
 
-Repeat for each speed. Every change is saved on the tank immediately.
+Every change is saved on the tank immediately.
 
 ## Check on your cats from work
 

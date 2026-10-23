@@ -29,9 +29,22 @@ object Mixer {
     }
 
     /** One stick: y is throttle, x is turn. Both wheels scale down together when a side saturates. */
-    fun arcade(x: Float, y: Float, s: Shaping): Wheels {
-        val throttle = shape(y, s)
-        val turn = shape(x, s)
+    fun arcade(x: Float, y: Float, s: Shaping): Wheels = mix(shape(y, s), shape(x, s), s)
+
+    /**
+     * Drive-straight calibration: linear throttle up to full speed, so every calibration
+     * point can be reached, and steering at [CAL_TURN] of its range, so a small
+     * correction is easy to hold.
+     */
+    fun calibration(x: Float, y: Float): Wheels {
+        val s = Shaping(maxSpeed = 100, deadZone = CAL_DEAD_ZONE, expo = 0f)
+        return mix(shape(y, s), shape(x, s) * CAL_TURN, s)
+    }
+
+    const val CAL_TURN = 0.25f
+    private const val CAL_DEAD_ZONE = 0.05f
+
+    private fun mix(throttle: Float, turn: Float, s: Shaping): Wheels {
         var l = throttle + turn
         var r = throttle - turn
         val m = max(abs(l), abs(r))
